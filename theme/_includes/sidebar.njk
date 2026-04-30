@@ -1,0 +1,52 @@
+{% set currentLang = page.lang or "ko" %}
+<aside class="space-y-8">
+    <!-- 최근 글 -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 class="text-lg font-bold text-dark-900 mb-4" data-i18n-sidebar="recentPosts">{{ i18n[currentLang].common.recentPosts | default(i18n.ko.common.recentPosts) }}</h3>
+        <ul class="space-y-3" id="sidebar-recent-posts">
+            {% set recentPosts = collections.blog | limit(10) %}
+            {% for post in recentPosts %}
+            <li class="sidebar-post-item" data-lang="{{ post.data.lang | default('ko') }}">
+                <a href="{{ post.url }}" class="text-sm text-dark-700 hover:text-primary-600 line-clamp-2">
+                    {{ post.data.title }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- 카테고리 -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 class="text-lg font-bold text-dark-900 mb-4" data-i18n-sidebar="categories">{{ i18n[currentLang].common.categories | default(i18n.ko.common.categories) }}</h3>
+        <ul class="space-y-2">
+            {% for category in categoryList %}
+            <li>
+                <a href="/categories/{{ category.slug }}/"
+                   class="flex items-center justify-between text-sm text-dark-700 hover:text-primary-600 group">
+                    <span>{{ category.name }}</span>
+                    <svg class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- 태그 클라우드 -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 class="text-lg font-bold text-dark-900 mb-4" data-i18n-sidebar="tags">{{ i18n[currentLang].common.tags | default(i18n.ko.common.tags) }}</h3>
+        <div class="flex flex-wrap gap-2">
+            {% set allTags = collections.blog | getAllTags %}
+            {% for tag in allTags %}
+                {% if tag !== "blog" and tag !== "post" %}
+                <a href="/tags/{{ tag }}/"
+                   class="inline-block px-3 py-1 text-xs font-medium bg-primary-50 text-primary-700 rounded-full hover:bg-primary-100 transition-colors">
+                    #{{ tag }}
+                </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</aside>
+

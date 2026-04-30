@@ -1,0 +1,158 @@
+---
+layout: base.njk
+---
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- 메인 컨텐츠 -->
+        <div class="lg:col-span-8">
+            <article class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <!-- Thumbnail 이미지 -->
+                {% if thumbnail %}
+                <div class="w-full aspect-video bg-gradient-to-br from-primary-100 to-accent-100 overflow-hidden">
+                    <img src="{{ thumbnail }}"
+                         alt="{{ title }}"
+                         class="w-full h-full object-cover"
+                         onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center\'><svg class=\'w-24 h-24 text-primary-300\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z\'></path></svg></div>';">
+                </div>
+                {% endif %}
+
+                <div class="p-8 lg:p-12">
+                    <header class="mb-8 pb-8 border-b border-gray-200">
+                        {% set currentLang = page.lang or "ko" %}
+                        {% set publishedDate = date %}
+                        {% set modifiedDate = updated or lastmod or date %}
+                        {% set showModified = (updated or lastmod) and (modifiedDate | dateFilter) != (publishedDate | dateFilter) %}
+
+                        {# 구조화 데이터: dateModified 신호 제공 #}
+                        <script type="application/ld+json">
+                        {
+                          "@context": "https://schema.org",
+                          "@type": "BlogPosting",
+                          "mainEntityOfPage": {
+                            "@type": "WebPage",
+                            "@id": "{{ site.url }}{{ page.url }}"
+                          },
+                          "headline": {{ (title or site.title) | dump | safe }},
+                          "description": {{ (description or site.description or "") | dump | safe }},
+                          "image": "{{ site.url }}{{ thumbnail or site.ogImage }}",
+                          "datePublished": "{{ publishedDate | isoDateTime }}",
+                          "dateModified": "{{ modifiedDate | isoDateTime }}",
+                          "author": {
+                            "@type": "Person",
+                            "name": "{{ site.author.name }}"
+                          },
+                          "publisher": {
+                            "@type": "Organization",
+                            "name": {{ (site.title or "") | dump | safe }},
+                            "logo": {
+                              "@type": "ImageObject",
+                              "url": "{{ site.url }}{{ site.logo }}"
+                            }
+                          }
+                        }
+                        </script>
+
+                        {% if category %}
+                        <a href="/categories/{{ category | slugify }}/"
+                           class="inline-block px-3 py-1 text-xs font-semibold bg-primary-100 text-primary-700 rounded-full mb-4 hover:bg-primary-200 transition-colors">
+                            {{ category }}
+                        </a>
+                        {% endif %}
+
+                        {% if draft %}
+                        <span class="inline-block px-3 py-1 text-xs font-semibold bg-accent-100 text-accent-600 rounded-full mb-4 ml-2" data-post-draft>
+                            {{ i18n[currentLang].post.draft | default(i18n.ko.post.draft) }}
+                        </span>
+                        {% endif %}
+
+                        <h1 class="text-4xl font-bold text-dark-900 mb-4">{{ title }}</h1>
+
+                        <div class="flex items-center gap-4 text-sm text-dark-700">
+                            <time datetime="{{ publishedDate | dateFilter }}" title="게시일">
+                                {{ publishedDate | dateFilter }}
+                            </time>
+                            {% if showModified %}
+                            <span>·</span>
+                            <time datetime="{{ modifiedDate | dateFilter }}" title="최종 수정일">
+                                수정 {{ modifiedDate | dateFilter }}
+                            </time>
+                            {% endif %}
+                            <span>·</span>
+                            <span data-reading-time>
+                                {{ content | readingTime }}{{ i18n[currentLang].common.readingTime | default(i18n.ko.common.readingTime) }}
+                            </span>
+                        </div>
+                    </header>
+
+                    <div class="prose prose-lg max-w-none mb-12">
+                        {{ content | safe }}
+                    </div>
+
+                    {% if tags %}
+                    <footer class="mt-12 pt-8 border-t border-gray-200">
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        {% for tag in tags %}
+                            {% if tag !== "blog" and tag !== "post" %}
+                                <a href="/tags/{{ tag }}/"
+                                   class="inline-block px-3 py-1 text-sm font-medium bg-gray-100 text-dark-700 rounded-full hover:bg-primary-100 hover:text-primary-700 transition-colors">
+                                    #{{ tag }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                        </div>
+                    </footer>
+                    {% endif %}
+
+                    <!-- 관련 글 -->
+                    {% include "related-posts.njk" %}
+
+                    <!-- Author 정보 -->
+                    <div class="mt-8">
+                        {% include "author.njk" %}
+                    </div>
+
+                    <!-- 이전글/다음글 네비게이션 -->
+                    <nav class="mt-12 pt-8 border-t border-gray-200">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% if pagination.href.previous %}
+                        <a href="{{ pagination.href.previous }}"
+                           class="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-all group">
+                            <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            <div class="flex-1 text-left">
+                                <div class="text-xs text-dark-700 mb-1" data-post-prev>{{ i18n[currentLang].post.prevPost | default(i18n.ko.post.prevPost) }}</div>
+                                <div class="text-sm font-medium text-dark-900 group-hover:text-primary-700">{{ pagination.items[pagination.pageNumber - 1].data.title }}</div>
+                            </div>
+                        </a>
+                        {% endif %}
+
+                        {% if pagination.href.next %}
+                        <a href="{{ pagination.href.next }}"
+                           class="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-all group md:ml-auto">
+                            <div class="flex-1 text-right">
+                                <div class="text-xs text-dark-700 mb-1" data-post-next>{{ i18n[currentLang].post.nextPost | default(i18n.ko.post.nextPost) }}</div>
+                                <div class="text-sm font-medium text-dark-900 group-hover:text-primary-700">{{ pagination.items[pagination.pageNumber + 1].data.title }}</div>
+                            </div>
+                            <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                        {% endif %}
+                        </div>
+                    </nav>
+
+                    <!-- 댓글 (provider selectable: Disqus / Utterances / none) -->
+                    {% comments %}
+                </div>
+            </article>
+        </div>
+
+        <!-- 사이드바 -->
+        <div class="lg:col-span-4">
+            {% include "sidebar.njk" %}
+        </div>
+    </div>
+</div>
+

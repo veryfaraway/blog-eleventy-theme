@@ -1,0 +1,339 @@
+{% set currentLang = page.lang or "ko" %}
+<header class="border-b border-gray-200 bg-white sticky top-0 z-50 shadow-sm theme-header" data-current-lang="{{ currentLang }}">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex-shrink-0">
+                <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                    <img src="{{ site.logo }}" alt="{{ site.title }}" class="w-8 h-8">
+                    <span class="text-xl font-bold theme-logo-text">{{ site.title }}</span>
+                </a>
+            </div>
+
+            <nav class="hidden md:flex items-center gap-6">
+                <a href="/" class="theme-nav-link" data-i18n-nav="home">
+                    {{ i18n[currentLang].nav.home | default(i18n.ko.nav.home) }}
+                </a>
+                <a href="/pages/" class="theme-nav-link" data-i18n-nav="page">
+                    {{ i18n[currentLang].nav.page | default(i18n.ko.nav.page) }}
+                </a>
+                <a href="/blog/" class="theme-nav-link" data-i18n-nav="blog">
+                    {{ i18n[currentLang].nav.blog | default(i18n.ko.nav.blog) }}
+                </a>
+                <a href="/categories/" class="theme-nav-link" data-i18n-nav="categories">
+                    {{ i18n[currentLang].nav.categories | default(i18n.ko.nav.categories) }}
+                </a>
+                <a href="/about/" class="theme-nav-link" data-i18n-nav="about">
+                    {{ i18n[currentLang].nav.about | default(i18n.ko.nav.about) }}
+                </a>
+
+                <!-- Language Switcher -->
+                <div class="flex items-center gap-2 ml-4 pl-4 border-l border-gray-200">
+                    <a href="?lang=ko"
+                       class="px-2 py-1 text-sm rounded hover:text-primary-600 transition-colors"
+                       data-lang-btn="ko"
+                       onclick="setLanguage('ko'); return false;">
+                        한국어
+                    </a>
+                    <span class="text-gray-300">|</span>
+                    <a href="?lang=en"
+                       class="px-2 py-1 text-sm rounded hover:text-primary-600 transition-colors"
+                       data-lang-btn="en"
+                       onclick="setLanguage('en'); return false;">
+                        English
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Mobile menu button -->
+            <button class="md:hidden p-2 rounded-lg hover:bg-gray-100" id="mobile-menu-btn">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile menu -->
+        <nav class="md:hidden hidden pb-4 space-y-2" id="mobile-menu">
+            <a href="/" class="theme-nav-link block px-3 py-2 rounded-lg" data-i18n-nav="home">
+                {{ i18n[currentLang].nav.home | default(i18n.ko.nav.home) }}
+            </a>
+            <a href="/pages/" class="theme-nav-link block px-3 py-2 rounded-lg" data-i18n-nav="page">
+                {{ i18n[currentLang].nav.page | default(i18n.ko.nav.page) }}
+            </a>
+            <a href="/blog/" class="theme-nav-link block px-3 py-2 rounded-lg" data-i18n-nav="blog">
+                {{ i18n[currentLang].nav.blog | default(i18n.ko.nav.blog) }}
+            </a>
+            <a href="/categories/" class="theme-nav-link block px-3 py-2 rounded-lg" data-i18n-nav="categories">
+                {{ i18n[currentLang].nav.categories | default(i18n.ko.nav.categories) }}
+            </a>
+            <a href="/about/" class="theme-nav-link block px-3 py-2 rounded-lg" data-i18n-nav="about">
+                {{ i18n[currentLang].nav.about | default(i18n.ko.nav.about) }}
+            </a>
+
+            <!-- Mobile Language Switcher -->
+            <div class="flex items-center gap-2 px-3 py-2 border-t border-gray-200 mt-2">
+                <span class="text-sm text-dark-700">Language:</span>
+                <a href="?lang=ko"
+                   class="px-2 py-1 text-sm rounded text-dark-700"
+                   data-lang-btn="ko"
+                   onclick="setLanguage('ko'); return false;">
+                    한국어
+                </a>
+                <span class="text-gray-300">|</span>
+                <a href="?lang=en"
+                   class="px-2 py-1 text-sm rounded text-dark-700"
+                   data-lang-btn="en"
+                   onclick="setLanguage('en'); return false;">
+                    English
+                </a>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<script>
+const siteTitleKo = {{ (site.title or "") | dump | safe }};
+const siteDescKo = {{ (site.description or "") | dump | safe }};
+const authorNameKo = {{ (site.author.name or "") | dump | safe }};
+const authorBioKo = {{ (site.author.bio or "") | dump | safe }};
+
+// Optional English overrides per-site (if provided in site.json)
+const siteTitleEn = {{ (site.titleEn or site.title or "") | dump | safe }};
+const siteDescEn = {{ (site.descriptionEn or site.description or "") | dump | safe }};
+const authorNameEn = {{ (site.author.nameEn or site.author.name or "") | dump | safe }};
+const authorBioEn = {{ (site.author.bioEn or site.author.bio or "") | dump | safe }};
+
+// 언어별 번역 데이터 (클라이언트 필터/푸터/네비 업데이트용 - 사이트별 문구는 site.json에서 주입)
+const i18nData = {
+  ko: {
+    nav: { home: "홈", page: "페이지", blog: "블로그", categories: "카테고리", about: "소개" },
+    home: { title: siteTitleKo, subtitle: siteDescKo, viewBlog: "블로그 보기", about: "소개", recentPosts: "최근 포스트", viewAll: "전체 보기 →", noPosts: "아직 포스트가 없습니다." },
+    blog: { title: "블로그", subtitle: siteDescKo, prevPage: "이전", nextPage: "다음" },
+    common: {
+      footer: {
+        description: siteDescKo,
+        navigation: "네비게이션",
+        categories: "카테고리",
+        rights: "All rights reserved.",
+        builtWith: "Built with Eleventy + Tailwind CSS"
+      }
+    },
+    sidebar: { recentPosts: "최근 글", categories: "카테고리", tags: "태그" },
+    author: { name: authorNameKo, bio: authorBioKo, github: "GitHub" },
+    post: { prevPost: "이전 글", nextPost: "다음 글", draft: "초안 (Draft)" }
+  },
+  en: {
+    nav: { home: "Home", page: "Pages", blog: "Blog", categories: "Categories", about: "About" },
+    home: { title: siteTitleEn, subtitle: siteDescEn, viewBlog: "View Blog", about: "About", recentPosts: "Recent Posts", viewAll: "View All →", noPosts: "No posts yet." },
+    blog: { title: "Blog", subtitle: siteDescEn, prevPage: "Previous", nextPage: "Next" },
+    common: {
+      footer: {
+        description: siteDescEn,
+        navigation: "Navigation",
+        categories: "Categories",
+        rights: "All rights reserved.",
+        builtWith: "Built with Eleventy + Tailwind CSS"
+      }
+    },
+    sidebar: { recentPosts: "Recent Posts", categories: "Categories", tags: "Tags" },
+    author: { name: authorNameEn, bio: authorBioEn, github: "GitHub" },
+    post: { prevPost: "Previous Post", nextPost: "Next Post", draft: "Draft" }
+  }
+};
+
+function getCurrentLang() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const langParam = urlParams.get('lang');
+    if (langParam && (langParam === 'ko' || langParam === 'en')) {
+        return langParam;
+    }
+    const savedLang = localStorage.getItem('preferredLanguage');
+    if (savedLang && (savedLang === 'ko' || savedLang === 'en')) {
+        return savedLang;
+    }
+    return 'ko';
+}
+
+function setLanguage(lang) {
+    localStorage.setItem('preferredLanguage', lang);
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('lang', lang);
+    window.history.replaceState({}, '', url.toString());
+
+    filterPostsByLang(lang);
+    updateUI(lang);
+    document.documentElement.lang = lang;
+}
+
+function filterPostsByLang(lang) {
+    const posts = document.querySelectorAll('.post-item');
+    let visibleCount = 0;
+
+    posts.forEach(post => {
+        const postLang = post.getAttribute('data-lang') || 'ko';
+        if (postLang === lang) {
+            post.style.display = '';
+            visibleCount++;
+        } else {
+            post.style.display = 'none';
+        }
+    });
+
+    const countDisplay = document.querySelector('[data-post-count]');
+    if (countDisplay) {
+        const text = lang === 'en' ? `${visibleCount} posts` : `${visibleCount}개의 포스트`;
+        countDisplay.textContent = text;
+    }
+
+    const container = document.getElementById('posts-container');
+    if (container) {
+        let noPostsMsg = document.getElementById('no-posts-message') || container.parentElement.querySelector('.no-posts-message');
+        if (visibleCount === 0) {
+            if (noPostsMsg) {
+                noPostsMsg.classList.remove('hidden');
+                noPostsMsg.style.display = 'block';
+                const msgPara = noPostsMsg.querySelector('p');
+                if (msgPara) {
+                    msgPara.textContent = lang === 'en' ? 'No posts in this language yet.' : '아직 이 언어의 포스트가 없습니다.';
+                }
+            } else {
+                noPostsMsg = document.createElement('div');
+                noPostsMsg.id = 'no-posts-message';
+                noPostsMsg.className = 'bg-white rounded-lg border border-gray-200 p-12 text-center no-posts-message';
+                noPostsMsg.innerHTML = `<p class="text-dark-700 text-lg mb-4">${lang === 'en' ? 'No posts in this language yet.' : '아직 이 언어의 포스트가 없습니다.'}</p>`;
+                container.parentElement.insertBefore(noPostsMsg, container);
+            }
+            container.classList.add('hidden');
+            container.style.display = 'none';
+        } else {
+            if (noPostsMsg) {
+                noPostsMsg.classList.add('hidden');
+                noPostsMsg.style.display = 'none';
+            }
+            container.classList.remove('hidden');
+            container.style.display = '';
+        }
+    }
+
+    const sidebarPosts = document.querySelectorAll('.sidebar-post-item');
+    let sidebarVisibleCount = 0;
+    const sidebarList = document.getElementById('sidebar-recent-posts');
+
+    if (sidebarList) {
+        sidebarPosts.forEach((post) => {
+            const postLang = post.getAttribute('data-lang') || 'ko';
+            if (postLang === lang && sidebarVisibleCount < 5) {
+                post.style.display = '';
+                sidebarVisibleCount++;
+            } else {
+                post.style.display = 'none';
+            }
+        });
+    }
+}
+
+function updateUI(lang) {
+    const i18n = i18nData[lang] || i18nData.ko;
+
+    const navLinks = document.querySelectorAll('[data-i18n-nav]');
+    navLinks.forEach(link => {
+        const key = link.getAttribute('data-i18n-nav');
+        if (i18n.nav[key]) {
+            link.textContent = i18n.nav[key];
+        }
+    });
+
+    const sidebarTitles = document.querySelectorAll('[data-i18n-sidebar]');
+    sidebarTitles.forEach(title => {
+        const key = title.getAttribute('data-i18n-sidebar');
+        if (i18n.sidebar && i18n.sidebar[key]) {
+            title.textContent = i18n.sidebar[key];
+        }
+    });
+
+    const authorCard = document.querySelector('[data-author-card]');
+    if (authorCard && i18n.author) {
+        const authorName = authorCard.querySelector('[data-author-name]');
+        const authorBio = authorCard.querySelector('[data-author-bio]');
+        const authorGithubText = authorCard.querySelector('[data-author-github-text]');
+        const authorImg = authorCard.querySelector('img');
+
+        if (authorName && i18n.author.name) authorName.textContent = i18n.author.name;
+        if (authorBio && i18n.author.bio) authorBio.textContent = i18n.author.bio;
+        if (authorGithubText && i18n.author.github) authorGithubText.textContent = i18n.author.github;
+        if (authorImg && i18n.author.name) authorImg.alt = i18n.author.name;
+    }
+
+    const readingTime = document.querySelector('[data-reading-time]');
+    if (readingTime && i18n.common && i18n.common.readingTime) {
+        const currentText = readingTime.textContent.trim();
+        const match = currentText.match(/(\d+)/);
+        if (match) {
+            const minutes = match[1];
+            readingTime.textContent = `${minutes} ${i18n.common.readingTime}`;
+        }
+    }
+
+    const prevPost = document.querySelector('[data-post-prev]');
+    const nextPost = document.querySelector('[data-post-next]');
+    const postDraft = document.querySelector('[data-post-draft]');
+    if (prevPost && i18n.post && i18n.post.prevPost) prevPost.textContent = i18n.post.prevPost;
+    if (nextPost && i18n.post && i18n.post.nextPost) nextPost.textContent = i18n.post.nextPost;
+    if (postDraft && i18n.post && i18n.post.draft) postDraft.textContent = i18n.post.draft;
+
+    if (i18n.common && i18n.common.footer && i18n.home) {
+        const footerTitle = document.querySelector('[data-footer-title]');
+        if (footerTitle && i18n.home.title) footerTitle.textContent = i18n.home.title;
+
+        const footerDescription = document.querySelector('[data-footer-description]');
+        if (footerDescription && i18n.common.footer.description) footerDescription.textContent = i18n.common.footer.description;
+
+        const footerNavTitle = document.querySelector('[data-footer-navigation-title]');
+        if (footerNavTitle && i18n.common.footer.navigation) footerNavTitle.textContent = i18n.common.footer.navigation;
+
+        const footerNavLinks = document.querySelectorAll('[data-footer-nav]');
+        footerNavLinks.forEach(link => {
+            const key = link.getAttribute('data-footer-nav');
+            if (i18n.nav && i18n.nav[key]) link.textContent = i18n.nav[key];
+        });
+
+        const footerCategoriesTitle = document.querySelector('[data-footer-categories-title]');
+        if (footerCategoriesTitle && i18n.common.footer.categories) footerCategoriesTitle.textContent = i18n.common.footer.categories;
+
+        const footerCopyright = document.querySelector('[data-footer-copyright]');
+        if (footerCopyright && i18n.home.title && i18n.common.footer.rights) {
+            footerCopyright.textContent = `© 2025 ${i18n.home.title}. ${i18n.common.footer.rights}`;
+        }
+
+        const footerBuiltWith = document.querySelector('[data-footer-builtwith]');
+        if (footerBuiltWith && i18n.common.footer.builtWith) footerBuiltWith.textContent = i18n.common.footer.builtWith;
+    }
+
+    document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+        const btnLang = btn.getAttribute('data-lang-btn');
+        if (btnLang === lang) {
+            btn.classList.add('bg-primary-100', 'text-primary-700', 'font-semibold');
+            btn.classList.remove('text-dark-700');
+        } else {
+            btn.classList.remove('bg-primary-100', 'text-primary-700', 'font-semibold');
+            btn.classList.add('text-dark-700');
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const lang = getCurrentLang();
+    const urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.get('lang')) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('lang', lang);
+        window.history.replaceState({}, '', url.toString());
+    }
+
+    filterPostsByLang(lang);
+    updateUI(lang);
+    document.documentElement.lang = lang;
+});
+</script>
+

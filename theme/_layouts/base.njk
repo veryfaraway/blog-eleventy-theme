@@ -1,0 +1,154 @@
+{% set currentLang = page.lang or "ko" %}
+<!DOCTYPE html>
+<html lang="{{ currentLang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if title %}{{ title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+    <meta name="description" content="{{ description or site.description }}">
+
+    <!-- SEO -->
+    <meta name="keywords" content="{{ keywords or site.keywords or "" }}">
+    <meta name="author" content="{{ site.author.name }}">
+    <link rel="canonical" href="{{ site.url }}{{ page.url }}">
+
+    <!-- Schema.org structured data (base) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "{% if layout == 'post.njk' %}BlogPosting{% else %}WebSite{% endif %}",
+      "headline": "{{ title or site.title }}",
+      "description": "{{ description or site.description }}",
+      "author": {
+        "@type": "Person",
+        "name": "{{ site.author.name }}"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "{{ site.title }}",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "{{ site.url }}{{ site.logo }}"
+        }
+      },
+      {% if date %}"datePublished": "{{ date | isoDateTime }}",{% endif %}
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ site.url }}{{ page.url }}"
+      }{% if thumbnail %},
+      "image": "{{ site.url }}{{ thumbnail }}"{% endif %}
+    }
+    </script>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% if title %}{{ title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}">
+    <meta property="og:description" content="{{ description or site.description }}">
+    <meta property="og:type" content="{{ ogType or "website" }}">
+    <meta property="og:url" content="{{ site.url }}{{ page.url }}">
+    <meta property="og:image" content="{{ site.url }}{{ thumbnail or site.ogImage }}">
+    <meta property="og:site_name" content="{{ site.title }}">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ title or site.title }}">
+    <meta name="twitter:description" content="{{ description or site.description }}">
+    <meta name="twitter:image" content="{{ site.url }}{{ thumbnail or site.ogImage }}">
+
+    <!-- Favicons (minimal by default; sites can add extra keys) -->
+    <link rel="icon" type="image/svg+xml" href="{{ site.favicon }}">
+    {% if site.favicon32 %}<link rel="icon" type="image/png" sizes="32x32" href="{{ site.favicon32 }}">{% endif %}
+    {% if site.favicon16 %}<link rel="icon" type="image/png" sizes="16x16" href="{{ site.favicon16 }}">{% endif %}
+    {% if site.appleTouchIcon %}<link rel="apple-touch-icon" sizes="180x180" href="{{ site.appleTouchIcon }}">{% endif %}
+    {% if site.webmanifest %}<link rel="manifest" href="{{ site.webmanifest }}">{% endif %}
+    {% if site.themeColor %}<meta name="theme-color" content="{{ site.themeColor }}">{% endif %}
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="/css/image-lightbox.css">
+    <link rel="stylesheet" href="/css/prism-theme.css">
+
+    <!-- Code Copy Script -->
+    <script src="/js/code-copy.js" defer></script>
+
+    <!-- External Links Script -->
+    <script src="/js/external-links.js" defer></script>
+
+    <!-- Image Lightbox Script -->
+    <script src="/js/image-lightbox.js" defer></script>
+
+    <!-- Google Analytics -->
+    {% set gaId = env.googleAnalytics or site.googleAnalytics %}
+    {% if gaId %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ gaId }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ gaId }}');
+    </script>
+    {% endif %}
+
+    <!-- Google AdSense (auto ads) -->
+    {% set adsenseEnabled = env.adsense.enabled %}
+    {% if adsenseEnabled == null or adsenseEnabled == "" %}
+      {% set adsenseEnabled = site.adsense.enabled %}
+    {% endif %}
+    {% set adsenseClient = env.adsense.client or site.adsense.client %}
+    {% if adsenseEnabled == true and adsenseClient %}
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ adsenseClient }}"
+            crossorigin="anonymous"></script>
+    {% endif %}
+</head>
+<body class="bg-gray-50 text-dark-900{% if theme and theme.current %} theme--{{ theme.current.name }}{% endif %}">
+    <div class="flex flex-col min-h-screen">
+        {% include "header.njk" %}
+
+        <main class="flex-1 w-full">
+            {{ content | safe }}
+        </main>
+
+        {% include "footer.njk" %}
+    </div>
+
+    <script>
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+    </script>
+
+    <!-- Mermaid runtime fallback:
+         - If build-time SVG transform succeeds, there will be no `language-mermaid` blocks left.
+         - If it fails (e.g., headless browser cannot launch), render in browser for stability. -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            securityLevel: 'loose'
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const codeBlocks = document.querySelectorAll('pre > code.language-mermaid');
+            if (!codeBlocks.length) return;
+
+            codeBlocks.forEach((codeEl) => {
+                const txt = codeEl.textContent;
+                const wrapper = document.createElement('div');
+                wrapper.className = 'mermaid';
+                wrapper.textContent = txt;
+                const pre = codeEl.closest('pre');
+                pre.parentNode.replaceChild(wrapper, pre);
+            });
+
+            try { mermaid.run(); } catch (e) { console.warn('Mermaid init failed', e); }
+        });
+    </script>
+</body>
+</html>
+

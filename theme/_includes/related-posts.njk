@@ -1,0 +1,34 @@
+{# 관련 글 컴포넌트 #}
+{% if relatedPosts and relatedPosts.length > 0 %}
+<div class="mt-12 pt-8 border-t border-gray-200">
+    <h2 class="text-2xl font-bold text-dark-900 mb-6">관련 글</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for slug in relatedPosts %}
+            {% set relatedPost = collections.blog | find(slug) %}
+            {% if relatedPost %}
+            <a href="{{ relatedPost.url }}" 
+               class="flex gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-all group">
+                {% if relatedPost.data.thumbnail %}
+                <div class="w-24 h-24 flex-shrink-0 rounded overflow-hidden bg-gradient-to-br from-primary-100 to-accent-100">
+                    <img src="{{ relatedPost.data.thumbnail }}" 
+                         alt="{{ relatedPost.data.title }}"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                </div>
+                {% endif %}
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-semibold text-dark-900 group-hover:text-primary-600 transition-colors mb-1 line-clamp-2">
+                        {{ relatedPost.data.title }}
+                    </h3>
+                    {% if relatedPost.data.description %}
+                    <p class="text-sm text-dark-700 line-clamp-2">
+                        {{ relatedPost.data.description }}
+                    </p>
+                    {% endif %}
+                </div>
+            </a>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+

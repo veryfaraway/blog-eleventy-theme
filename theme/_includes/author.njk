@@ -1,0 +1,16 @@
+{% set currentLang = page.lang or "ko" %}
+<div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200 p-6" data-author-card>
+    <div class="flex items-center gap-4">
+        <img src="{{ site.author.avatar }}" alt="{{ site.author.name }}" class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm">
+        <div class="flex-1 min-w-0">
+            <h3 class="text-lg font-bold text-dark-900" data-author-name>{{ site.author.name }}</h3>
+            <p class="text-sm text-dark-700 mt-1" data-author-bio>{{ site.author.bio }}</p>
+            {% if site.author.github %}
+            <a href="{{ site.author.github }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 mt-3">
+                <span data-author-github-text>{{ i18n[currentLang].author.github | default(i18n.ko.author.github) }}</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+

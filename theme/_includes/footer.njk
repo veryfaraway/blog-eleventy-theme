@@ -1,0 +1,39 @@
+{% set currentLang = page.lang or "ko" %}
+<footer class="border-t border-gray-200 bg-gray-50 mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div>
+                <h3 class="font-bold text-dark-900 mb-4" data-footer-title>{{ i18n[currentLang].home.title | default(i18n.ko.home.title) }}</h3>
+                <p class="text-dark-700 text-sm" data-footer-description>
+                    {{ i18n[currentLang].common.footer.description | default(i18n.ko.common.footer.description) }}
+                </p>
+            </div>
+
+            <div>
+                <h3 class="font-bold text-dark-900 mb-4" data-footer-navigation-title>{{ i18n[currentLang].common.footer.navigation | default(i18n.ko.common.footer.navigation) }}</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="/" class="text-dark-700 hover:text-primary-600" data-footer-nav="home">{{ i18n[currentLang].nav.home | default(i18n.ko.nav.home) }}</a></li>
+                    <li><a href="/pages/" class="text-dark-700 hover:text-primary-600" data-footer-nav="page">{{ i18n[currentLang].nav.page | default(i18n.ko.nav.page) }}</a></li>
+                    <li><a href="/blog/" class="text-dark-700 hover:text-primary-600" data-footer-nav="blog">{{ i18n[currentLang].nav.blog | default(i18n.ko.nav.blog) }}</a></li>
+                    <li><a href="/categories/" class="text-dark-700 hover:text-primary-600" data-footer-nav="categories">{{ i18n[currentLang].nav.categories | default(i18n.ko.nav.categories) }}</a></li>
+                    <li><a href="/about/" class="text-dark-700 hover:text-primary-600" data-footer-nav="about">{{ i18n[currentLang].nav.about | default(i18n.ko.nav.about) }}</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="font-bold text-dark-900 mb-4" data-footer-categories-title>{{ i18n[currentLang].common.footer.categories | default(i18n.ko.common.footer.categories) }}</h3>
+                <ul class="space-y-2 text-sm">
+                    {% for category in categoryList | slice(0, 4) %}
+                    <li><a href="/categories/{{ category.slug }}/" class="text-dark-700 hover:text-primary-600">{{ category.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-dark-700">
+            <p data-footer-copyright>&copy; 2025 {{ i18n[currentLang].home.title | default(i18n.ko.home.title) }}. {{ i18n[currentLang].common.footer.rights | default(i18n.ko.common.footer.rights) }}</p>
+            <p data-footer-builtwith>{{ i18n[currentLang].common.footer.builtWith | default(i18n.ko.common.footer.builtWith) }}</p>
+        </div>
+    </div>
+</footer>
+

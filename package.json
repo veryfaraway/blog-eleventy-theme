@@ -1,0 +1,15 @@
+{
+  "name": "@veryfaraway/eleventy-theme",
+  "version": "0.1.0",
+  "description": "Shared Eleventy theme for blog-eleventy-* sites",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@11ty/eleventy-img": "^6.0.4",
+    "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.0",
+    "markdown-it": "^14.1.1",
+    "minimatch": "^10.2.1",
+    "prismjs": "^1.30.0"
+  }
+}
+
