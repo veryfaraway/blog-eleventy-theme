@@ -94,16 +94,51 @@ blog-eleventy-theme/
 
 ### 1단계: 테마 패키지 설치
 
-새 블로그 프로젝트 폴더에서 다음 명령어를 실행하세요:
+이 테마는 npm registry에 배포되어 있지 않으므로 GitHub URL로 설치합니다.
 
-```bash
-npm install @veryfaraway/eleventy-theme
+#### 방법 A: GitHub URL (권장 — Netlify 등 CI/CD 환경 포함)
+
+`package.json`의 `devDependencies`에 직접 추가하세요:
+
+```json
+{
+  "devDependencies": {
+    "@veryfaraway/eleventy-theme": "github:veryfaraway/blog-eleventy-theme"
+  }
+}
 ```
 
-> **참고**: 로컬 개발 중이라면 상대 경로로 설치할 수 있습니다:
-> ```bash
-> npm install ../blog-eleventy-theme
-> ```
+그리고 설치:
+
+```bash
+npm install
+```
+
+#### 방법 B: 버전(태그) 고정 — 안정적인 운영 환경 권장
+
+테마 레포에 Git 태그가 있다면 특정 버전을 고정할 수 있습니다:
+
+```json
+"@veryfaraway/eleventy-theme": "github:veryfaraway/blog-eleventy-theme#v1.0.0"
+```
+
+특정 커밋 해시로 고정하는 것도 가능합니다:
+
+```json
+"@veryfaraway/eleventy-theme": "github:veryfaraway/blog-eleventy-theme#abc1234"
+```
+
+> **버전 고정을 권장하는 이유**: 태그 없이 `github:...` 형태로 사용하면 `main` 브랜치의 최신 코드가 항상 설치됩니다. 테마 변경이 블로그 빌드에 예기치 않게 영향을 줄 수 있으므로, 운영 중인 블로그는 태그로 고정하고 의도적으로 업그레이드하는 것이 좋습니다.
+
+#### 방법 C: 로컬 개발 환경
+
+테마와 블로그를 같은 머신에서 동시에 개발할 때는 상대 경로를 사용할 수 있습니다:
+
+```json
+"@veryfaraway/eleventy-theme": "file:../blog-eleventy-theme"
+```
+
+> ⚠️ `file:` 경로는 로컬에서만 동작합니다. Netlify 등 원격 빌드 환경에서는 반드시 방법 A 또는 B를 사용하세요.
 
 ### 2단계: `.eleventy.js` 설정 파일 작성
 
@@ -387,6 +422,18 @@ node node_modules/@veryfaraway/eleventy-theme/scripts/sync-templates.js
 npm run sync-theme
 ```
 
+`postinstall`에 등록해두면 `npm install` 시 자동으로 실행됩니다:
+
+```json
+{
+  "scripts": {
+    "postinstall": "node node_modules/@veryfaraway/eleventy-theme/scripts/sync-templates.js || echo 'skip sync-templates'"
+  }
+}
+```
+
+> `|| echo 'skip sync-templates'` 를 붙이면 스크립트가 없을 때도 설치가 중단되지 않습니다.
+
 ### 방법 3: 스타일 커스터마이징
 
 #### Tailwind CSS 설정
@@ -594,6 +641,18 @@ eleventyConfig.addCollection("Frontend", function (collection) {
 2. `ELEVENTY_ENV=production`으로 빌드하세요
 3. 초안(draft) 포스트는 자동으로 제외됩니다
 4. Google Analytics, AdSense ID를 확인하세요
+
+### Q9. Netlify 배포 시 테마를 찾지 못해요.
+
+**A**: `package.json`에서 `file:` 경로를 사용하고 있기 때문입니다. Netlify는 원격 빌드 환경이므로 로컬 상대 경로를 참조할 수 없습니다.
+
+`package.json`을 GitHub URL 방식으로 변경하세요:
+
+```json
+"@veryfaraway/eleventy-theme": "github:veryfaraway/blog-eleventy-theme"
+```
+
+변경 후 `npm install`을 실행해 `package-lock.json`을 업데이트하고 커밋하면 Netlify 빌드가 정상 작동합니다.
 
 ---
 
