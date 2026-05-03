@@ -31,7 +31,7 @@
         </div>
 
         <div class="border-t border-gray-200 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-dark-700">
-            <p data-footer-copyright>&copy; 2025 {{ i18n[currentLang].home.title | default(i18n.ko.home.title) }}. {{ i18n[currentLang].common.footer.rights | default(i18n.ko.common.footer.rights) }}</p>
+            <p data-footer-copyright>&copy; {{ "" | currentYear }} {{ i18n[currentLang].home.title | default(i18n.ko.home.title) }}. {{ i18n[currentLang].common.footer.rights | default(i18n.ko.common.footer.rights) }}</p>
             <p data-footer-builtwith>{{ i18n[currentLang].common.footer.builtWith | default(i18n.ko.common.footer.builtWith) }}</p>
         </div>
     </div>

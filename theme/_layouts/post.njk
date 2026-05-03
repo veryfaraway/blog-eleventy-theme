@@ -69,12 +69,12 @@ layout: base.njk
                         <h1 class="text-4xl font-bold text-dark-900 mb-4">{{ title }}</h1>
 
                         <div class="flex items-center gap-4 text-sm text-dark-700">
-                            <time datetime="{{ publishedDate | dateFilter }}" title="게시일">
+                            <time datetime="{{ publishedDate | isoDateTime }}" title="게시일">
                                 {{ publishedDate | dateFilter }}
                             </time>
                             {% if showModified %}
                             <span>·</span>
-                            <time datetime="{{ modifiedDate | dateFilter }}" title="최종 수정일">
+                            <time datetime="{{ modifiedDate | isoDateTime }}" title="최종 수정일">
                                 수정 {{ modifiedDate | dateFilter }}
                             </time>
                             {% endif %}

@@ -79,6 +79,10 @@ module.exports = function eleventyTheme(eleventyConfig, options = {}) {
   eleventyConfig.addShortcode("adsense", adsenseShortcode);
 
   // Filters
+  eleventyConfig.addFilter("currentYear", function () {
+    return new Date().getFullYear();
+  });
+
   eleventyConfig.addFilter("dateFilter", function (date) {
     const d = date instanceof Date ? date : new Date(date);
     const year = d.getFullYear();
@@ -121,8 +125,21 @@ module.exports = function eleventyTheme(eleventyConfig, options = {}) {
   });
 
   // i18n convenience filters
+  // i18n.js는 빌드 시작 시 한 번만 로드 (매 호출마다 require하지 않음)
+  let _i18nCache = null;
+  function getI18n() {
+    if (!_i18nCache) {
+      try {
+        _i18nCache = require(path.join(process.cwd(), "src", "_data", "i18n.js"));
+      } catch (_e) {
+        _i18nCache = {};
+      }
+    }
+    return _i18nCache;
+  }
+
   eleventyConfig.addFilter("t", function (key, lang = "ko") {
-    const i18n = require(path.join(process.cwd(), "src", "_data", "i18n.js"));
+    const i18n = getI18n();
     const keys = String(key).split(".");
     let value = i18n[lang] || i18n.ko;
     for (const k of keys) {

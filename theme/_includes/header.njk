@@ -103,43 +103,23 @@ const siteDescEn = {{ (site.descriptionEn or site.description or "") | dump | sa
 const authorNameEn = {{ (site.author.nameEn or site.author.name or "") | dump | safe }};
 const authorBioEn = {{ (site.author.bioEn or site.author.bio or "") | dump | safe }};
 
-// 언어별 번역 데이터 (클라이언트 필터/푸터/네비 업데이트용 - 사이트별 문구는 site.json에서 주입)
-const i18nData = {
-  ko: {
-    nav: { home: "홈", page: "페이지", blog: "블로그", categories: "카테고리", about: "소개" },
-    home: { title: siteTitleKo, subtitle: siteDescKo, viewBlog: "블로그 보기", about: "소개", recentPosts: "최근 포스트", viewAll: "전체 보기 →", noPosts: "아직 포스트가 없습니다." },
-    blog: { title: "블로그", subtitle: siteDescKo, prevPage: "이전", nextPage: "다음" },
-    common: {
-      footer: {
-        description: siteDescKo,
-        navigation: "네비게이션",
-        categories: "카테고리",
-        rights: "All rights reserved.",
-        builtWith: "Built with Eleventy + Tailwind CSS"
-      }
-    },
-    sidebar: { recentPosts: "최근 글", categories: "카테고리", tags: "태그" },
-    author: { name: authorNameKo, bio: authorBioKo, github: "GitHub" },
-    post: { prevPost: "이전 글", nextPost: "다음 글", draft: "초안 (Draft)" }
-  },
-  en: {
-    nav: { home: "Home", page: "Pages", blog: "Blog", categories: "Categories", about: "About" },
-    home: { title: siteTitleEn, subtitle: siteDescEn, viewBlog: "View Blog", about: "About", recentPosts: "Recent Posts", viewAll: "View All →", noPosts: "No posts yet." },
-    blog: { title: "Blog", subtitle: siteDescEn, prevPage: "Previous", nextPage: "Next" },
-    common: {
-      footer: {
-        description: siteDescEn,
-        navigation: "Navigation",
-        categories: "Categories",
-        rights: "All rights reserved.",
-        builtWith: "Built with Eleventy + Tailwind CSS"
-      }
-    },
-    sidebar: { recentPosts: "Recent Posts", categories: "Categories", tags: "Tags" },
-    author: { name: authorNameEn, bio: authorBioEn, github: "GitHub" },
-    post: { prevPost: "Previous Post", nextPost: "Next Post", draft: "Draft" }
-  }
-};
+// i18n 데이터를 빌드 시 i18n.js에서 직접 주입 — 하드코딩 없음
+// site.json의 사이트별 값(title, description, author)은 런타임에 덮어씀
+const i18nData = {{ i18n | dump | safe }};
+
+// 사이트별 동적 값 주입 (i18n.js에 없는 site.json 고유 값)
+if (i18nData.ko) {
+  i18nData.ko.home = Object.assign({}, i18nData.ko.home, { title: siteTitleKo, subtitle: siteDescKo });
+  i18nData.ko.common = i18nData.ko.common || {};
+  i18nData.ko.common.footer = Object.assign({}, (i18nData.ko.common || {}).footer, { description: siteDescKo });
+  i18nData.ko.author = Object.assign({}, i18nData.ko.author, { name: authorNameKo, bio: authorBioKo });
+}
+if (i18nData.en) {
+  i18nData.en.home = Object.assign({}, i18nData.en.home, { title: siteTitleEn, subtitle: siteDescEn });
+  i18nData.en.common = i18nData.en.common || {};
+  i18nData.en.common.footer = Object.assign({}, (i18nData.en.common || {}).footer, { description: siteDescEn });
+  i18nData.en.author = Object.assign({}, i18nData.en.author, { name: authorNameEn, bio: authorBioEn });
+}
 
 function getCurrentLang() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -303,7 +283,7 @@ function updateUI(lang) {
 
         const footerCopyright = document.querySelector('[data-footer-copyright]');
         if (footerCopyright && i18n.home.title && i18n.common.footer.rights) {
-            footerCopyright.textContent = `© 2025 ${i18n.home.title}. ${i18n.common.footer.rights}`;
+            footerCopyright.textContent = `© ${new Date().getFullYear()} ${i18n.home.title}. ${i18n.common.footer.rights}`;
         }
 
         const footerBuiltWith = document.querySelector('[data-footer-builtwith]');

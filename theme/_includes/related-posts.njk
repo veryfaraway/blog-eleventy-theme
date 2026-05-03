@@ -1,7 +1,8 @@
 {# 관련 글 컴포넌트 #}
 {% if relatedPosts and relatedPosts.length > 0 %}
+{% set currentLang = page.lang or "ko" %}
 <div class="mt-12 pt-8 border-t border-gray-200">
-    <h2 class="text-2xl font-bold text-dark-900 mb-6">관련 글</h2>
+    <h2 class="text-2xl font-bold text-dark-900 mb-6">{{ i18n[currentLang].post.relatedPosts | default(i18n.ko.post.relatedPosts) }}</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {% for slug in relatedPosts %}
             {% set relatedPost = collections.blog | find(slug) %}
