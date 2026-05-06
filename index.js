@@ -205,7 +205,9 @@ module.exports = function eleventyTheme(eleventyConfig, options = {}) {
     return totalMinutes > 0 ? totalMinutes : 1;
   });
 
-  // Alert paired shortcode (use markdown-it to render inner content)
+  // Alert paired shortcode
+  // Note: when used in .md files, Eleventy pre-renders the content as HTML before
+  // passing it to the shortcode, so we use content directly without md.render().
   eleventyConfig.addPairedShortcode("alert", function (content, type = "info", title = "") {
     const typeConfig = {
       info: { icon: "💡", defaultTitle: "정보" },
@@ -215,10 +217,15 @@ module.exports = function eleventyTheme(eleventyConfig, options = {}) {
     };
     const config = typeConfig[type] || typeConfig.info;
     const displayTitle = title || config.defaultTitle;
-    const renderedContent = md
-      .render(String(content || "").trim())
-      .replace(/<\/p>\s*<p>/g, " ")
-      .replace(/<\/?p>/g, "");
+    // Content from .md files arrives pre-rendered as HTML.
+    // Content from .njk files arrives as raw text, so we run md.render() as fallback.
+    const isHtml = /<[a-z][\s\S]*>/i.test(String(content || ""));
+    const renderedContent = isHtml
+      ? String(content || "").trim()
+      : md
+          .render(String(content || "").trim())
+          .replace(/<\/p>\s*<p>/g, " ")
+          .replace(/<\/?p>/g, "");
     return `<div class="alert alert-${type}">\n<strong class="alert-title">${config.icon} ${displayTitle}</strong>\n${renderedContent}\n</div>`;
   });
 
