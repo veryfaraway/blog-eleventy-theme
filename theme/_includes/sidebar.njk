@@ -40,7 +40,7 @@
             {% set allTags = collections.blog | getAllTags %}
             {% for tag in allTags %}
                 {% if tag !== "blog" and tag !== "post" %}
-                <a href="/tags/{{ tag }}/"
+                <a href="/tags/{{ tag | tagSlugify }}/"
                    class="inline-block px-3 py-1 text-xs font-medium bg-primary-50 text-primary-700 rounded-full hover:bg-primary-100 transition-colors">
                     #{{ tag }}
                 </a>

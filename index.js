@@ -124,8 +124,21 @@ module.exports = function eleventyTheme(eleventyConfig, options = {}) {
       .sort();
   });
 
-  eleventyConfig.addFilter("filterByTag", function (collection, tag) {
-    return (collection || []).filter((item) => (item.data?.tags || []).includes(tag));
+  eleventyConfig.addFilter("filterByTag", function (collection, tagSlug) {
+    // Match posts whose tags, when slugified, equal the given tagSlug.
+    // This allows tag labels like "Apple TV+" to match the URL slug "apple-tv-plus".
+    return (collection || []).filter((item) =>
+      (item.data?.tags || []).some((t) => tagSlugify(t) === tagSlug)
+    );
+  });
+
+  // tagSlugify: converts a tag label to a URL-safe slug.
+  // - English: lowercase, spaces → hyphens, strip special chars except hyphens
+  // - Korean/CJK: preserve characters, spaces → hyphens
+  // Examples: "Apple TV+" → "apple-tv-plus", "Philip K. Dick" → "philip-k-dick",
+  //           "스파이더맨" → "스파이더맨", "행복을 찾아서" → "행복을-찾아서"
+  eleventyConfig.addFilter("tagSlugify", function (tag) {
+    return tagSlugify(tag);
   });
 
   eleventyConfig.addFilter("find", function (collection, slug) {
@@ -566,6 +579,42 @@ function adsenseShortcode(type = "display") {
 
 function escapeHtmlAttr(v) {
   return String(v).replace(/"/g, "&quot;");
+}
+
+/**
+ * tagSlugify — converts a tag label to a URL-safe slug.
+ *
+ * Rules:
+ *  - Korean/CJK characters are preserved (they encode cleanly in modern browsers)
+ *  - Spaces → hyphens
+ *  - "+" → "-plus"  (e.g. "Apple TV+" → "apple-tv-plus")
+ *  - Dots → hyphens (e.g. "Philip K. Dick" → "philip-k-dick")
+ *  - All other special characters are stripped
+ *  - Latin letters are lowercased
+ *  - Multiple consecutive hyphens are collapsed
+ *
+ * @param {string} tag
+ * @returns {string}
+ */
+function tagSlugify(tag) {
+  if (!tag) return "";
+  const str = String(tag).trim();
+  const hasCJK = /[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF\u4E00-\u9FFF]/.test(str);
+  if (hasCJK) {
+    return str
+      .replace(/\s+/g, "-")
+      .replace(/[^\uAC00-\uD7AF\u1100-\u11FF\u3130-\u318F\u4E00-\u9FFF\w-]/g, "")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+  }
+  return str
+    .toLowerCase()
+    .replace(/\+/g, "-plus")
+    .replace(/\./g, "-")
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 // ---------------------------------------------------------------------------
