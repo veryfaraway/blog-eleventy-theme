@@ -333,6 +333,29 @@ module.exports = function eleventyTheme(eleventyConfig, options = {}) {
       .sort((a, b) => b.date - a.date);
   });
 
+  // tagList collection: collect all unique tags from blog posts
+  // Store as objects with both original tag and slugified version to ensure clean URLs
+  eleventyConfig.addCollection("tagList", function (collectionApi) {
+    const tagMap = new Map();
+    
+    collectionApi.getAll().forEach((item) => {
+      if (item.data?.tags) {
+        item.data.tags.forEach((tag) => {
+          // Skip meta tags
+          if (tag !== "blog" && tag !== "post") {
+            const slug = tagSlugify(tag);
+            // Use slug as key to avoid duplicates (e.g., "Apple TV+" and "apple tv+" both become "apple-tv-plus")
+            if (!tagMap.has(slug)) {
+              tagMap.set(slug, { original: tag, slug: slug });
+            }
+          }
+        });
+      }
+    });
+    
+    return Array.from(tagMap.values()).sort((a, b) => a.slug.localeCompare(b.slug));
+  });
+
   // Return Eleventy directory configuration for apps to use.
   // Apps will override includes/layouts to point at this package's theme files.
   return {
