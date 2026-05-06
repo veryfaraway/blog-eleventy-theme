@@ -1,0 +1,65 @@
+{# 시리즈 목차 박스 (포스트 본문 상단) #}
+{% if series %}
+{% set seriesPosts = collections.blog | filterBySeries(series) | sortBySeries %}
+{% set totalPosts = seriesPosts.length %}
+
+{% if totalPosts > 1 %}
+<div class="series-toc not-prose mb-10 rounded-xl border-2 border-primary-200 shadow-sm overflow-hidden">
+  <!-- 헤더 -->
+  <div class="bg-gradient-to-r from-primary-600 to-primary-500 px-6 py-4">
+    <div class="flex items-center gap-3">
+      <div class="flex-shrink-0 w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+        </svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-primary-100 text-xs font-semibold uppercase tracking-widest mb-0.5">시리즈</p>
+        <h3 class="text-white font-bold text-lg leading-tight truncate">{{ series }}</h3>
+      </div>
+      <div class="flex-shrink-0 bg-white/20 rounded-full px-3 py-1">
+        <span class="text-white text-sm font-bold">{{ totalPosts }}편</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 목차 리스트 -->
+  <div class="bg-gradient-to-b from-primary-50/60 to-white p-5">
+    <ol class="space-y-2.5">
+      {% for post in seriesPosts %}
+      <li class="flex items-start gap-3 group">
+        <!-- 번호 뱃지 -->
+        <span class="flex-shrink-0 w-7 h-7 mt-0.5 rounded-full flex items-center justify-center text-xs font-bold transition-colors
+          {% if post.url == page.url %}
+            bg-primary-600 text-white ring-2 ring-primary-300 ring-offset-1
+          {% else %}
+            bg-white text-gray-500 border-2 border-gray-200 group-hover:border-primary-300 group-hover:text-primary-600
+          {% endif %}">
+          {{ loop.index }}
+        </span>
+
+        <!-- 제목 -->
+        {% if post.url == page.url %}
+          <div class="flex-1 pt-0.5">
+            <span class="font-bold text-primary-700 text-sm leading-snug block">{{ post.data.title }}</span>
+            <span class="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 bg-primary-600 text-white text-xs font-semibold rounded-full">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+              현재 글
+            </span>
+          </div>
+        {% else %}
+          <a href="{{ post.url }}" class="flex-1 pt-0.5 group/link">
+            <span class="font-medium text-gray-700 group-hover/link:text-primary-600 text-sm leading-snug block transition-colors">
+              {{ post.data.title }}
+            </span>
+          </a>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</div>
+{% endif %}
+{% endif %}

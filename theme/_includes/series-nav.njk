@@ -1,0 +1,88 @@
+{# 시리즈 이전/다음 네비게이션 (포스트 본문 하단) #}
+{% if series %}
+{% set seriesPosts = collections.blog | filterBySeries(series) | sortBySeries %}
+{% set totalPosts = seriesPosts.length %}
+{% set currentIndex = -1 %}
+
+{% for post in seriesPosts %}
+  {% if post.url == page.url %}
+    {% set currentIndex = loop.index0 %}
+  {% endif %}
+{% endfor %}
+
+{% if totalPosts > 1 and currentIndex >= 0 %}
+<nav class="series-nav not-prose mt-10 pt-8 border-t-2 border-gray-100">
+  <!-- 헤더 -->
+  <div class="flex items-center justify-between mb-5">
+    <div class="flex items-center gap-2">
+      <svg class="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h10"></path>
+      </svg>
+      <span class="font-bold text-gray-800 text-base">시리즈 계속 읽기</span>
+    </div>
+    <span class="text-sm text-gray-400 font-medium bg-gray-100 px-3 py-1 rounded-full">
+      {{ currentIndex + 1 }} / {{ totalPosts }}
+    </span>
+  </div>
+
+  <!-- 이전/다음 카드 -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <!-- 이전 편 -->
+    {% if currentIndex > 0 %}
+    {% set prevPost = seriesPosts[currentIndex - 1] %}
+    <a href="{{ prevPost.url }}"
+       class="flex items-center gap-4 p-4 rounded-xl border-2 border-gray-200 bg-white hover:border-primary-400 hover:bg-primary-50 hover:shadow-md transition-all group">
+      <div class="flex-shrink-0 w-9 h-9 rounded-full bg-gray-100 group-hover:bg-primary-600 flex items-center justify-center transition-colors">
+        <svg class="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1">이전 편 · {{ currentIndex }}편</div>
+        <div class="font-bold text-gray-800 group-hover:text-primary-700 text-sm leading-snug line-clamp-2 transition-colors">
+          {{ prevPost.data.title }}
+        </div>
+      </div>
+    </a>
+    {% else %}
+    <div class="flex items-center justify-center p-4 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50">
+      <div class="text-center">
+        <svg class="w-6 h-6 text-gray-300 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"></path>
+        </svg>
+        <span class="text-xs text-gray-400 font-medium">첫 번째 편</span>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- 다음 편 -->
+    {% if currentIndex < totalPosts - 1 %}
+    {% set nextPost = seriesPosts[currentIndex + 1] %}
+    <a href="{{ nextPost.url }}"
+       class="flex items-center gap-4 p-4 rounded-xl border-2 border-gray-200 bg-white hover:border-primary-400 hover:bg-primary-50 hover:shadow-md transition-all group md:flex-row-reverse">
+      <div class="flex-shrink-0 w-9 h-9 rounded-full bg-gray-100 group-hover:bg-primary-600 flex items-center justify-center transition-colors">
+        <svg class="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </div>
+      <div class="flex-1 min-w-0 md:text-right">
+        <div class="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1">다음 편 · {{ currentIndex + 2 }}편</div>
+        <div class="font-bold text-gray-800 group-hover:text-primary-700 text-sm leading-snug line-clamp-2 transition-colors">
+          {{ nextPost.data.title }}
+        </div>
+      </div>
+    </a>
+    {% else %}
+    <div class="flex items-center justify-center p-4 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 md:col-start-2">
+      <div class="text-center">
+        <svg class="w-6 h-6 text-gray-300 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z" transform="rotate(180 12 12)"></path>
+        </svg>
+        <span class="text-xs text-gray-400 font-medium">마지막 편</span>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</nav>
+{% endif %}
+{% endif %}
