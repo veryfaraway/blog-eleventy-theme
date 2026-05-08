@@ -56,6 +56,7 @@ module.exports = function eleventyTheme(eleventyConfig, options = {}) {
     breaks: true,
     linkify: true,
   });
+  md.core.ruler.after("inline", "cjk_emphasis_after_punctuation", cjkEmphasisAfterPunctuation);
   eleventyConfig.setLibrary("md", md);
 
   // Drafts: in production, skip draft post templates before rendering.
@@ -662,6 +663,62 @@ function tagSlugify(tag) {
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
+}
+
+function cjkEmphasisAfterPunctuation(state) {
+  const cjkEmphasisPattern =
+    /(\*\*|__)([^\n]+?[\)\]\}\.,!?！？。．、，])\1(?=[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF])/g;
+
+  for (const blockToken of state.tokens) {
+    if (blockToken.type !== "inline" || !blockToken.children) continue;
+
+    const children = [];
+    let changed = false;
+
+    for (const token of blockToken.children) {
+      if (token.type !== "text") {
+        children.push(token);
+        continue;
+      }
+
+      cjkEmphasisPattern.lastIndex = 0;
+      let lastIndex = 0;
+      let match;
+
+      while ((match = cjkEmphasisPattern.exec(token.content)) !== null) {
+        changed = true;
+
+        if (match.index > lastIndex) {
+          children.push(createTextToken(state, token.content.slice(lastIndex, match.index)));
+        }
+
+        const open = new state.Token("strong_open", "strong", 1);
+        open.markup = match[1];
+        children.push(open);
+        children.push(createTextToken(state, match[2]));
+
+        const close = new state.Token("strong_close", "strong", -1);
+        close.markup = match[1];
+        children.push(close);
+
+        lastIndex = match.index + match[0].length;
+      }
+
+      if (lastIndex < token.content.length) {
+        children.push(createTextToken(state, token.content.slice(lastIndex)));
+      }
+    }
+
+    if (changed) {
+      blockToken.children = children;
+    }
+  }
+}
+
+function createTextToken(state, content) {
+  const token = new state.Token("text", "", 0);
+  token.content = content;
+  return token;
 }
 
 // ---------------------------------------------------------------------------
