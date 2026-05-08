@@ -58,6 +58,14 @@ module.exports = function eleventyTheme(eleventyConfig, options = {}) {
   });
   eleventyConfig.setLibrary("md", md);
 
+  // Drafts: in production, skip draft post templates before rendering.
+  // This protects sites even when local data files override eleventyComputed.permalink.
+  eleventyConfig.addPreprocessor("draftPosts", "md,njk,html", function (data) {
+    if (isProductionDraft(data) && data?.page?.inputPath?.includes("/posts/")) {
+      return false;
+    }
+  });
+
   // Static assets
   eleventyConfig.addPassthroughCopy("src/css");
   eleventyConfig.addPassthroughCopy("src/js");
@@ -232,7 +240,12 @@ module.exports = function eleventyTheme(eleventyConfig, options = {}) {
   // Permalink: computed permalink (stable + consistent)
   if (resolvedOptions.permalink.mode === "computed") {
     eleventyConfig.addGlobalData("eleventyComputed", {
+      eleventyExcludeFromCollections: (data) => {
+        if (isProductionDraft(data)) return true;
+        return data.eleventyExcludeFromCollections;
+      },
       permalink: (data) => {
+        if (isProductionDraft(data)) return false;
         if (!data?.page?.inputPath?.includes("/posts/")) return data.permalink;
 
         const date = data.date || data.page.date || new Date();
@@ -373,6 +386,10 @@ module.exports = function eleventyTheme(eleventyConfig, options = {}) {
       output: "_site",
     },
   };
+
+  function isProductionDraft(data) {
+    return process.env.ELEVENTY_ENV === "production" && data?.draft === true;
+  }
 
   function renderMermaidSvg(code) {
     const decoded = String(code)
@@ -856,4 +873,3 @@ function escapeJsString(v) {
   // Only used inside a template literal where quotes are fixed; keep conservative.
   return String(v).replace(/[^a-zA-Z0-9_-]/g, "");
 }
-
