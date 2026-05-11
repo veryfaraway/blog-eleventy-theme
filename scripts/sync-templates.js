@@ -49,7 +49,34 @@ function writeManifest(manifestPath, manifest) {
  */
 function syncDir(srcDir, destDir, manifest, nextManifest, baseRel = "") {
   if (!fs.existsSync(srcDir)) return;
-  fs.mkdirSync(destDir, { recursive: true });
+  // If destDir doesn't exist, create it. 
+  // However, if we are syncing a single file (not a folder), we should check that.
+  if (!fs.lstatSync(srcDir).isDirectory()) {
+    // Single file sync logic
+    const relPath = baseRel;
+    const themeHash = hashFile(srcDir);
+    const localHash = hashFile(destDir);
+    const lastSyncHash = manifest[relPath];
+
+    nextManifest[relPath] = themeHash;
+
+    if (!localHash) {
+      fs.copyFileSync(srcDir, destDir);
+      console.log(`  [new]   ${relPath}`);
+    } else if (localHash !== lastSyncHash && lastSyncHash !== undefined) {
+      if (themeHash !== lastSyncHash) {
+        console.warn(`  [skip]  ${relPath}  ⚠️  테마도 업데이트됨 — 수동 병합 필요`);
+      } else {
+        console.log(`  [skip]  ${relPath}  (로컬 수정 보호)`);
+      }
+    } else if (localHash !== themeHash) {
+      fs.copyFileSync(srcDir, destDir);
+      console.log(`  [update] ${relPath}  (테마 업데이트 반영)`);
+    }
+    return;
+  }
+
+  if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true });
 
   const entries = fs.readdirSync(srcDir, { withFileTypes: true });
   for (const ent of entries) {
@@ -64,26 +91,18 @@ function syncDir(srcDir, destDir, manifest, nextManifest, baseRel = "") {
       const localHash = hashFile(dest);
       const lastSyncHash = manifest[relPath];
 
-      // 이번 sync 후 매니페스트에 테마 원본 해시를 기록
       nextManifest[relPath] = themeHash;
 
       if (!localHash) {
-        // 케이스 1: 로컬에 파일 없음 → 신규 복사
         fs.copyFileSync(src, dest);
         console.log(`  [new]   ${relPath}`);
       } else if (localHash !== lastSyncHash && lastSyncHash !== undefined) {
-        // 케이스 2: 사용자가 수정한 파일 → 건너뜀
         if (themeHash !== lastSyncHash) {
-          // 테마도 바뀐 경우 충돌 경고
           console.warn(`  [skip]  ${relPath}  ⚠️  테마도 업데이트됨 — 수동 병합 필요`);
         } else {
           console.log(`  [skip]  ${relPath}  (로컬 수정 보호)`);
         }
-      } else if (localHash === themeHash) {
-        // 케이스 3a: 이미 최신 → 아무것도 안 함
-        // (로그 생략으로 출력 간소화)
-      } else {
-        // 케이스 3b: 사용자 수정 없음 + 테마가 업데이트됨 → 덮어씀
+      } else if (localHash !== themeHash) {
         fs.copyFileSync(src, dest);
         console.log(`  [update] ${relPath}  (테마 업데이트 반영)`);
       }
@@ -110,6 +129,7 @@ function main() {
     { src: path.join(themeRoot, "_includes"), dest: path.join(srcRoot, "_includes") },
     { src: path.join(themeRoot, "_layouts"),  dest: path.join(srcRoot, "_layouts")  },
     { src: path.join(themeRoot, "css"),       dest: path.join(srcRoot, "css")       },
+    { src: path.join(themeRoot, "sitemap.njk"), dest: path.join(srcRoot, "sitemap.njk") },
   ];
 
   console.log("[eleventy-theme] 템플릿 동기화 시작...");

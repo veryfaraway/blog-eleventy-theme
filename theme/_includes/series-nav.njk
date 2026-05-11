@@ -1,6 +1,8 @@
 {# 시리즈 이전/다음 네비게이션 (포스트 본문 하단) #}
 {% if series %}
+<!-- DEBUG: series = {{ series }} -->
 {% set seriesPosts = collections.blog | filterBySeries(series) | sortBySeries %}
+<!-- DEBUG: totalPosts = {{ seriesPosts.length }} -->
 {% set totalPosts = seriesPosts.length %}
 {% set currentIndex = -1 %}
 
@@ -9,10 +11,11 @@
     {% set currentIndex = loop.index0 %}
   {% endif %}
 {% endfor %}
+<!-- DEBUG: currentIndex = {{ currentIndex }} -->
 
 {% if totalPosts > 1 and currentIndex >= 0 %}
 <nav class="series-nav not-prose mt-10 pt-8 border-t-2 border-gray-100">
-  <!-- 헤더 -->
+... (rest of the content)
   <div class="flex items-center justify-between mb-5">
     <div class="flex items-center gap-2">
       <svg class="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

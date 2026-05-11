@@ -1,0 +1,29 @@
+---
+permalink: /sitemap.xml
+eleventyExcludeFromCollections: true
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  {%- for page in collections.all %}
+  {%- if not page.data.draft %}
+  <url>
+    <loc>{{ site.url }}{{ page.url | url }}</loc>
+    {%- set lastModDate = page.data.lastmod or page.data.updated or page.date %}
+    <lastmod>{{ lastModDate | dateFilter }}</lastmod>
+    {%- if page.url == "/" %}
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    {%- elif page.url.startsWith("/blog") or page.url.startsWith("/posts") %}
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    {%- elif page.url.startsWith("/categories") or page.url.startsWith("/tags") %}
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+    {%- else %}
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    {%- endif %}
+  </url>
+  {%- endif %}
+  {%- endfor %}
+</urlset>
