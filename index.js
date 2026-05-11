@@ -363,26 +363,29 @@ module.exports = function eleventyTheme(eleventyConfig, options = {}) {
   });
 
   // tagList collection: collect all unique tags from blog posts
-  // Store as objects with both original tag and slugified version to ensure clean URLs
+  // Store as objects with original tag, slug, and count for visualization
   eleventyConfig.addCollection("tagList", function (collectionApi) {
     const tagMap = new Map();
     
-    collectionApi.getAll().forEach((item) => {
+    collectionApi.getFilteredByGlob("src/posts/**/*.md").forEach((item) => {
       if (item.data?.tags) {
         item.data.tags.forEach((tag) => {
-          // Skip meta tags
           if (tag !== "blog" && tag !== "post") {
             const slug = tagSlugify(tag);
-            // Use slug as key to avoid duplicates (e.g., "Apple TV+" and "apple tv+" both become "apple-tv-plus")
             if (!tagMap.has(slug)) {
-              tagMap.set(slug, { original: tag, slug: slug });
+              tagMap.set(slug, { original: tag, slug: slug, count: 1 });
+            } else {
+              tagMap.get(slug).count += 1;
             }
           }
         });
       }
     });
     
-    return Array.from(tagMap.values()).sort((a, b) => a.slug.localeCompare(b.slug));
+    // Return top 50 tags sorted by count desc, then slug
+    return Array.from(tagMap.values())
+      .sort((a, b) => b.count - a.count || a.slug.localeCompare(b.slug))
+      .slice(0, 50);
   });
 
   // Return Eleventy directory configuration for apps to use.

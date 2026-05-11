@@ -37,14 +37,14 @@
     <div class="bg-white rounded-lg border border-gray-200 p-6">
         <h3 class="text-lg font-bold text-dark-900 mb-4" data-i18n-sidebar="tags">{{ i18n[currentLang].common.tags | default(i18n.ko.common.tags) }}</h3>
         <div class="flex flex-wrap gap-2">
-            {% set allTags = collections.blog | getAllTags %}
-            {% for tag in allTags %}
-                {% if tag !== "blog" and tag !== "post" %}
-                <a href="/tags/{{ tag | tagSlugify }}/"
-                   class="inline-block px-3 py-1 text-xs font-medium bg-primary-50 text-primary-700 rounded-full hover:bg-primary-100 transition-colors">
-                    #{{ tag }}
+            {% for tag in collections.tagList %}
+                <a href="/tags/{{ tag.slug }}/"
+                   class="inline-block transition-all hover:scale-105 hover:text-primary-600 
+                   {% if tag.count > 10 %}text-base font-bold text-dark-900
+                   {% elif tag.count > 5 %}text-sm font-semibold text-dark-700
+                   {% else %}text-xs text-gray-500{% endif %}">
+                    #{{ tag.original }}
                 </a>
-                {% endif %}
             {% endfor %}
         </div>
     </div>
