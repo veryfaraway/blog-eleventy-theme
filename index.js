@@ -39,6 +39,7 @@ module.exports = function eleventyTheme(eleventyConfig, options = {}) {
       enabled: options.redirects?.enabled ?? true,
       outputPath: options.redirects?.outputPath || path.join("_site", "_redirects"),
     },
+    tagColor: options.tagColor || "ocean",
   };
 
   eleventyConfig.addGlobalData("themeOptions", resolvedOptions);
