@@ -876,7 +876,6 @@ async function movieShortcode(title, imdbId, posterUrl = "") {
 
   if (!movieData && apiKey) {
     try {
-      const fetch = (await import("node-fetch")).default;
       const response = await fetch(`https://www.omdbapi.com/?i=${imdbId}&apikey=${apiKey}`);
       movieData = await response.json();
       if (movieData.Response === "True") {

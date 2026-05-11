@@ -109,6 +109,7 @@ function main() {
   const syncTargets = [
     { src: path.join(themeRoot, "_includes"), dest: path.join(srcRoot, "_includes") },
     { src: path.join(themeRoot, "_layouts"),  dest: path.join(srcRoot, "_layouts")  },
+    { src: path.join(themeRoot, "css"),       dest: path.join(srcRoot, "css")       },
   ];
 
   console.log("[eleventy-theme] 템플릿 동기화 시작...");

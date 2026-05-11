@@ -35,8 +35,8 @@
       "mainEntityOfPage": {
         "@type": "WebPage",
         "@id": "{{ site.url | absoluteUrl(site.url) }}{{ page.url }}"
-      }{% if thumbnail %},
-      "image": "{{ thumbnail | absoluteUrl(site.url) }}"{% endif %}
+      },
+      "image": "{{ (thumbnail or site.ogImage) | absoluteUrl(site.url) }}"
     }
     </script>
 
