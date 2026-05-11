@@ -37,13 +37,23 @@
     <div class="bg-white rounded-lg border border-gray-200 p-6">
         <h3 class="text-lg font-bold text-dark-900 mb-4" data-i18n-sidebar="tags">{{ i18n[currentLang].common.tags | default(i18n.ko.common.tags) }}</h3>
         <div class="flex flex-wrap gap-2">
+            {% set palette = themeOptions.tagColor or "ocean" %}
             {% for tag in collections.tagList %}
+                {% if palette == "sunset" %}
+                    {% set activeClass = "bg-gradient-to-r from-orange-500 to-red-500 text-white" %}
+                    {% set hoverClass = "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800" %}
+                {% else %} {# default: ocean #}
+                    {% set activeClass = "bg-gradient-to-r from-blue-600 to-blue-700 text-white" %}
+                    {% set hoverClass = "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800" %}
+                {% endif %}
+
                 <a href="/tags/{{ tag.slug }}/"
-                   class="inline-block transition-all hover:scale-105 hover:text-primary-600 
-                   {% if tag.count > 10 %}text-base font-bold text-dark-900
-                   {% elif tag.count > 5 %}text-sm font-semibold text-dark-700
-                   {% else %}text-xs text-gray-500{% endif %}">
+                   class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full transition-all duration-200 hover:scale-105 hover:shadow-md
+                   {% if tag.count > 10 %}{{ activeClass }}
+                   {% elif tag.count > 5 %}{{ hoverClass }}
+                   {% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
                     #{{ tag.original }}
+                    <span class="ml-1 opacity-70 text-[10px]">{{ tag.count }}</span>
                 </a>
             {% endfor %}
         </div>
