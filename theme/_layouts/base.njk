@@ -28,15 +28,15 @@
         "name": "{{ site.title }}",
         "logo": {
           "@type": "ImageObject",
-          "url": "{{ site.url }}{{ site.logo }}"
+          "url": "{{ site.logo | absoluteUrl(site.url) }}"
         }
       },
       {% if date %}"datePublished": "{{ date | isoDateTime }}",{% endif %}
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "{{ site.url }}{{ page.url }}"
+        "@id": "{{ site.url | absoluteUrl(site.url) }}{{ page.url }}"
       }{% if thumbnail %},
-      "image": "{{ site.url }}{{ thumbnail }}"{% endif %}
+      "image": "{{ thumbnail | absoluteUrl(site.url) }}"{% endif %}
     }
     </script>
 
@@ -44,15 +44,15 @@
     <meta property="og:title" content="{% if title %}{{ title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}">
     <meta property="og:description" content="{{ description or site.description }}">
     <meta property="og:type" content="{{ ogType or "website" }}">
-    <meta property="og:url" content="{{ site.url }}{{ page.url }}">
-    <meta property="og:image" content="{{ site.url }}{{ thumbnail or site.ogImage }}">
+    <meta property="og:url" content="{{ site.url | absoluteUrl(site.url) }}{{ page.url }}">
+    <meta property="og:image" content="{{ (thumbnail or site.ogImage) | absoluteUrl(site.url) }}">
     <meta property="og:site_name" content="{{ site.title }}">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ title or site.title }}">
     <meta name="twitter:description" content="{{ description or site.description }}">
-    <meta name="twitter:image" content="{{ site.url }}{{ thumbnail or site.ogImage }}">
+    <meta name="twitter:image" content="{{ (thumbnail or site.ogImage) | absoluteUrl(site.url) }}">
 
     <!-- Favicons (minimal by default; sites can add extra keys) -->
     <link rel="icon" type="image/svg+xml" href="{{ site.favicon }}">

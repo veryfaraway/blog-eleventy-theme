@@ -202,6 +202,14 @@ module.exports = function eleventyTheme(eleventyConfig, options = {}) {
     return (collection || []).filter((item) => (item.data?.lang || "ko") === lang);
   });
 
+  eleventyConfig.addFilter("absoluteUrl", function (path, base) {
+    if (!path) return "";
+    if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("//")) {
+      return path;
+    }
+    return (base || "").replace(/\/$/, "") + "/" + path.replace(/^\//, "");
+  });
+
   // Reading time
   eleventyConfig.addFilter("readingTime", function (content) {
     if (!content) return 1;
